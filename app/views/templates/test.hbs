@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  {{>meta}}
+    
+    <title>Тест</title>
+</head>
+<body class="" >
+  {{>nav}}
+    <div class="container bg-primary-subtle m-auto"> 
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title fs-5" id="exampleModalLabel">Уже зарегистрированы?</h4>
+                <button type="button" id="modalClose" class="btn btn-danger btn-close" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form>
+                <div class="mb-3">
+                    <label for="recipient-name" class="col-form-label">Введите идентификатор пользователя, если Вы уже зарегистрированы</label>
+                    <input type="text" class="form-control" id="userId" placeholder="ID">
+                </div>
+                <button type="button" id="modalSearch" class="btn btn-primary">Найти</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                
+            </div>
+            </div>
+        </div>
+</div>
+
+                <div class="d-flex justify-content-end row">
+                    <div class="col-md-8 col-lg-8">
+                        <div class="border">
+                            <div class="question bg-white p-3 border-bottom">
+                                <div class="d-flex flex-row justify-content-between align-items-center " id="q-number">
+                                    <span>Шаг 1 из 7</span></div>
+                            </div>
+                            <div class="question bg-white p-3 border-bottom" >
+                                <div class="d-flex flex-row align-items-center question-title" id="quest-title">
+                                    <h4 class="mt-1 ml-2"></h4>
+                                </div>
+                                <div class="ans ml-2" id="ans-block">
+                                     
+                                    
+                                </div><div id="error-msg" class="text-danger">
+                                    
+                                </div>
+                                
+                </div>
+                    <div class="d-flex flex-row justify-content-between align-items-center p-3 bg-white">
+                        {{!-- <button class="btn btn-primary d-flex align-items-center btn-danger" type="button">
+                            <i class="fa fa-angle-left mt-1 mr-1"></i>&nbsp;Назад</button> --}}
+                        <button class="btn btn-primary border-success align-items-center btn-secondary" data-id="0" id="next-btn" type="button">Далее
+                            <i class="fa fa-angle-right ml-2"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+         
+              
+              
+{{>footer}} 
+           <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>       
+<script>
+$('#exampleModal').modal('show');
+$('#modalClose').on('click',()=>{
+    $('#exampleModal').modal('hide');
+})
+
+$('#modalSearch').on('click', ()=>{
+    let id = $('#userId').val()
+    registered(id)
+})
+
+const questions=[{
+    title:'Сколько Вам лет?',
+    options:['42-60', '61-75', '75-99']
+},
+{
+    title:'?',
+    options:['Да', 'Нет']
+},
+{
+    title:'Ваш пол?',
+    options:['Мужской', 'Женский']
+}
+
+]
+let results=[]
+var socket = io(':3001');
+async function registered(id){
+    
+    socket.emit("user", id);
+    
+   
+}
+
+ socket.on('userRes',(data)=>{
+        console.log(data)
+        window.location.href=`http://localhost:3000/?status=true&type=&days=&id=&activities=${data}`
+    } )
+
+async function sendResults(res){
+    
+    socket.emit("results", res);
+    
+   
+}
+
+ socket.on('response',(data)=>{
+        console.log(data)
+        /*let response = JSON.parse(data)
+        console.log(response)
+        window.location.href=`http://localhost:3000/?status=true&type=${response.type}&days=${response.days.join(',')}&id=${response.id}`*/
+    } )
+
+function showQuestion(n,t){
+    if(t==n){
+        return true
+    }
+    let q=questions[n]
+    $('#q-number').empty()
+    $('#q-number').append(`<span>Шаг ${n+1} из ${t}</span>`)
+    $('#quest-title').empty()
+    $('#quest-title').append(`<h4 class="mt-1 ml-2">${q.title}</h4>`)
+    $('#ans-block').empty()
+    for(let i=0;i<q.options.length;i++){
+        $('#ans-block').append(`<div class="form-check">
+                                        <input class="form-check-input answer" type="radio" value="${i+1}" name="1" id="ans-${i+1}">
+                                        <label class="form-check-label" for="age-1">
+                                            ${q.options[i]}
+                                        </label>
+                                    </div>`)
+    }
+    $('#next-btn').data('id',n)
+    
+     return false
+}
+
+$('#next-btn').on('click',()=>{
+    let arr=[]
+    $('.answer:checked').each(function() {
+        arr.push(this.value);
+        results.push(this.value);
+    });
+    if(arr.length<1){
+        
+        $('#error-msg').html(`<p class='text-danger'>Вы ничего не выбрали! Чтобы продолжить тест, необхзодимо один из приведенных ответов</p>`)
+    }else{
+        $('#error-msg').empty()
+        let isFinished = showQuestion($('#next-btn').data('id')+1,questions.length)
+        if(isFinished){
+
+            sendResults(results)
+        }
+       
+    }
+})
+showQuestion(0,questions.length)
+</script>
+</body>
+</html>

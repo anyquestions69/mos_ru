@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: app
+    build: app/
+    working_dir:
+      /usr/src/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    env_file:
+      - ./app/.env
+    command: npm run start
+
+  # Контейнер с базой данных
+  db:
+    container_name: db
+    #image: postgres:12-alpine
+    build: db_data/
+    environment:
+      POSTGRES_DB: "test_db"
+      POSTGRES_USER: "public_hysteria"
+      POSTGRES_PASSWORD: "0666"
+    ports:
+      - "5432:5432"
+    restart: always
+
+  rabbitmq:
+    container_name: rabbitmq
+    image:  rabbitmq:3.11-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+
+  broker:
+    container_name: broker
+    build: broker/
+    working_dir:
+      /usr/src/broker
+    ports:
+      - "3001:3001"
+    depends_on:
+      - rabbitmq
+    command: node index.js
+
+  
+
+
+
+

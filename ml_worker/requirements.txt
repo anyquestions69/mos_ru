@@ -1,0 +1,6 @@
+pandas
+eventlet
+numpy
+scipy
+scikit-learn
+socketio
