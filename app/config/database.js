@@ -3,6 +3,5 @@ const sequelize = new Sequelize(`postgres://${process.env.DB_USER}:${process.env
   host:"postgres",
   dialect: "postgres"
 });*/
-const status = require('./importcsv.js')
-console.log(status)
+
 module.exports = sequelize

@@ -2,7 +2,7 @@ const Sequelize = require("sequelize");
 const sequelize = require('../config/database')
 
 
-const Visitor = sequelize.define('visitor',{
+/* const Visitor = sequelize.define('visitor',{
     id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
@@ -15,18 +15,7 @@ const Visitor = sequelize.define('visitor',{
     }
 })
 
-const Role = sequelize.define("role",{
-    id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-        allowNull: false
-      },
-    name:{
-        type: Sequelize.STRING,
-        allowNull: false
-    }
-})
+
 
 const User = sequelize.define("user", {
     uid: {
@@ -92,7 +81,7 @@ const User = sequelize.define("user", {
     timestamps: false
   })
 
-
+ */
 const Group = sequelize.define('group',{
   id: {
       type: Sequelize.BIGINT,
@@ -158,4 +147,4 @@ sequelize.sync({force: false}).then(async function (result){
 })
 .catch(err=> console.log(err));
 
-module.exports = {User, Activity, Visitor, Group, Category}
+module.exports = { Group}

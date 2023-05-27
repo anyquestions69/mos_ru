@@ -1,6 +1,5 @@
 const express = require('express')
 require("dotenv").config();
-const categoryRouter = require('./routers/categoryRouter.js')
 const groupRouter = require('./routers/groupRouter.js')
 const viewRouter = require('./routers/staticRouter.js')
 const hbs = require('hbs')
@@ -22,7 +21,6 @@ app.use(jsonParser)
 app.use("/static",express.static(__dirname + "/views/static"))
 
 
-api.use('/categories', categoryRouter)
 api.use('/groups', groupRouter)
 
 

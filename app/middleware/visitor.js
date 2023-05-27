@@ -1,4 +1,4 @@
-const {User, Visitor} = require('../models/user')
+/* const {User, Visitor} = require('../models/user')
 const config = process.env;
 const IP = require('ip');
 
@@ -22,4 +22,4 @@ class Visit{
         }
     }
 }
-module.exports = new Visit()
+module.exports = new Visit() */
