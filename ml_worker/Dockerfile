@@ -1,14 +1,10 @@
 FROM python:3.8-alpine
 
 RUN apk update && apk add --no-cache \
-    gcc python3-dev \
-    postgresql-libs postgresql-dev musl-dev
+    gcc python3-dev 
 
-RUN mkdir /code
-COPY requirements.txt /code
-WORKDIR /code
-RUN apk add --no-cache --upgrade bash
-RUN apk add python3 py3-pip 
-RUN apk add libffi-dev
+WORKDIR /ml_worker
+COPY requirements.txt /ml_worker/
+
 RUN pip3 install -r ./requirements.txt --verbose
-COPY . /code/
+COPY . /ml_worker/

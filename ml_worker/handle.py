@@ -1,4 +1,5 @@
 import json
+import uuid
 import pika
 from functions import *
 
@@ -7,14 +8,13 @@ connection = pika.BlockingConnection(
 
 channel = connection.channel()
 
-channel.queue_declare(queue='test_queue')
-
+channel.queue_declare(queue='rpc_queue')
 
 
 def on_request(ch, method, props, body):
    
-    print(body)
-    response = json.dumps({"test":"ok"})
+    print(json.loads(body))
+    response = json.dumps(['Образование', 'Творчество'])
 
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,
@@ -23,9 +23,10 @@ def on_request(ch, method, props, body):
                      body=str(response))
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
-
+consumer_tag = uuid.uuid1().hex
 channel.basic_qos(prefetch_count=1)
-channel.basic_consume(queue='test_queue', on_message_callback=on_request)
 
-print(" [x] Awaiting RPC requests")
+channel.basic_consume(queue='rpc_queue',consumer_tag=consumer_tag, on_message_callback=on_request)
+
+print(" [x] Awaiting RPC requests", consumer_tag)
 channel.start_consuming()

@@ -8,98 +8,105 @@ const io = new Server(server,{
         origin: "*"
       }
 });
-var amqplib = require('amqplib/callback_api');
+var amqp = require('amqplib/callback_api');
 
-var APPRABMQ
-var mainChannel
-var exchange = 'direct'
-try {
-    amqplib.connect('amqp://rabbitmq', function(error0, conn) {			
+const amqplib = require('amqplib');
+var connection
+var channel
+const queue = 'tasks';
+var exchange = 'direct_logs';
+var ex
+
+amqp.connect('amqp://localhost', function(error0, conn) {
     if (error0) {
         throw error0;
     }
-    conn.createChannel(function(error1, channel) {
-      if (error1) {
-          throw error1;
-      }
-      channel.assertExchange(exchange, 'direct', {
-        durable: false
-      });
-      mainChannel=channel
-    })
-    APPRABMQ=conn
-})
-} catch (error) {
-    throw error
-}
+    connection=conn
+    connection.createChannel(function(error1, ch) {
+        if (error1) {
+            throw error1;
+        }
+        channel=ch
+        
+    });
+});
 
 
 io.on('connection', (socket) => {
-    socket.on('results', (res)=>{
+    console.log('connected')
+    socket.on('results', async(res)=>{
         let qmsg = JSON.stringify(res)
-        if(mainChannel){
-                
-          mainChannel.assertQueue('', {
-            exclusive: true
-        }, function(error2, q) {
-            if (error2) {
-                throw error2;
-            }
-            var correlationId = generateUuid();
-            mainChannel.consume(q.queue, function(msg) {
-                if (msg.properties.correlationId === correlationId) {
-                    console.log(' [.] Got %s', msg.content.toString());
-                    socket.emit("userRes", msg.content.toString());
-                    mainChannel.deleteQueue(q.queue)
-                    return
-                }
-            }, {
-                noAck: true
-            });
-  
-            mainChannel.sendToQueue('rpc_queue',
-                Buffer.from(qmsg.toString()), {
-                    correlationId: correlationId,
-                    replyTo: q.queue
-                });
-        });
-		} else {
-			socket.emit('RabbitMQ is off',function(sresp){});
-		}
-    })
-    /* socket.on('user',(uid)=>{
-      
-      if(mainChannel){
-         
-        mainChannel.assertQueue('', {
-          exclusive: true
-      }, function(error2, q) {
-          if (error2) {
-              throw error2;
-          }
-          var correlationId = generateUuid();
-          mainChannel.consume(q.queue, function(msg) {
-              if (msg.properties.correlationId === correlationId) {
-                  console.log(' [.] Got %s', msg.content.toString());
-                  socket.emit("userRes", msg.content.toString());
-                  mainChannel.deleteQueue(q.queue)
-              }
-          }, {
-              noAck: true
-          });
 
-          mainChannel.sendToQueue('rpc_queue',
-              Buffer.from(uid.toString()), {
-                  correlationId: correlationId,
-                  replyTo: q.queue
-              });
-      });
-                
-            
+        console.log(`[ ${new Date()} ] Message sent: ${qmsg}`);
+        if(channel){
+            channel.prefetch(1, false);
+            channel.assertQueue('', {
+                exclusive: true,
+                autoDelete:true
+            }, function(error2, q) {
+                if (error2) {
+                    throw error2;
+                }
+                var correlationId = generateUuid();
+                var ct= generateUuid()
+                channel.consume(q.queue,function(msg) {
+                    console.log(q)
+                    if (msg.properties.correlationId === correlationId) {
+                        console.log(' [.] По результатам теста %s', msg.content.toString());
+                        socket.emit('response', msg.content.toString())
+                    }
+                    channel.cancel(ct);
+                    
+                }, {
+                    consumerTag:ct, 
+                    noAck: true
+                });
+                channel.sendToQueue('rpc_queue',
+                    Buffer.from(qmsg), {
+                        correlationId: correlationId,
+                        replyTo: q.queue
+                    });
+            });
         }else{
-          socket.emit('RabbitMQ is off',function(sresp){});
+            socket.emit('err', 'error')
         }
-    }) */
+        
+		
+    })
+
+    socket.on('user', async(uid)=>{
+        console.log(uid)
+        if(channel){
+            channel.assertQueue('', {
+                exclusive: true,
+                autoDelete:true
+            }, function(error2, q) {
+                if (error2) {
+                    throw error2;
+                }
+                var correlationId = generateUuid();
+                var ct= generateUuid()
+                channel.consume(q.queue, function(msg) {
+                    if (msg.properties.correlationId === correlationId) {
+                        console.log(' [.] User %s', msg.content.toString());
+                        socket.emit('userRes', msg.content.toString())
+                    }
+                    channel.cancel(ct);
+                }, {
+                    consumerTag:ct, 
+                    noAck: true
+                });
+                channel.sendToQueue('user_queue',
+                    Buffer.from(uid), {
+                        correlationId: correlationId,
+                        replyTo: q.queue
+                    });
+            });
+        }else{
+            socket.emit('response', 'error')
+        }
+    })
+    
   });
   
   server.listen(3001, () => {
