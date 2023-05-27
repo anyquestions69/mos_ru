@@ -9,13 +9,8 @@ const io = new Server(server,{
       }
 });
 var amqp = require('amqplib/callback_api');
-
-const amqplib = require('amqplib');
 var connection
 var channel
-const queue = 'tasks';
-var exchange = 'direct_logs';
-var ex
 
 amqp.connect('amqp://localhost', function(error0, conn) {
     if (error0) {
@@ -37,7 +32,6 @@ io.on('connection', (socket) => {
     socket.on('results', async(res)=>{
         let qmsg = JSON.stringify(res)
 
-        console.log(`[ ${new Date()} ] Message sent: ${qmsg}`);
         if(channel){
             channel.prefetch(1, false);
             channel.assertQueue('', {
@@ -50,7 +44,6 @@ io.on('connection', (socket) => {
                 var correlationId = generateUuid();
                 var ct= generateUuid()
                 channel.consume(q.queue,function(msg) {
-                    console.log(q)
                     if (msg.properties.correlationId === correlationId) {
                         console.log(' [.] По результатам теста %s', msg.content.toString());
                         socket.emit('response', msg.content.toString())

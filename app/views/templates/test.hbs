@@ -4,6 +4,8 @@
   {{>meta}}
     
     <title>Тест</title>
+     <script src="https://api-maps.yandex.ru/2.1/?apikey=a9d15a8f-8e1f-49ab-acf9-ea13ae030532&lang=ru_RU" type="text/javascript">
+    </script>
 </head>
 <body class="" >
   {{>nav}}
@@ -77,6 +79,21 @@ $('#modalSearch').on('click', ()=>{
     let id = $('#userId').val()
     registered(id)
 })
+/*ymaps.ready(init);
+
+function init() {
+  var location = ymaps.geolocation.get({autoReverseGeocode:true});
+
+location.then(
+  function(result) {
+    // Добавление местоположения на карту.
+    console.log(result.geoObjects)//.get(0).properties.getAll())
+  },
+  function(err) {
+    console.log('Ошибка: ' + err)
+  }
+);
+}*/
 
 const questions=[{
     title:'Чем вы занимались в детстве?',
@@ -102,8 +119,8 @@ async function registered(id){
 }
 
  socket.on('userRes',(data)=>{
-        console.log(data)
-        window.location.href=`http://localhost:3000/?status=true&type=&days=&id=&activities=${data.join()}`
+        let res = JSON.parse(data)
+        window.location.href=`http://localhost:3000/?status=true&type=&days=&id=&activities=${res.join(',')}`
     } )
 
 async function sendResults(res){

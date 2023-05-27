@@ -30,9 +30,6 @@ services:
     ports:
       - "5432:5432"
     restart: always
-    #command: psql test_db < /docker-entrypoint-initdb.d/backup2.sql
-              
-  
 
   rabbitmq:
     container_name: rabbitmq
@@ -53,6 +50,12 @@ services:
       - rabbitmq
     command: node index.js
     restart: always
+
+  ml_worker:
+    container_name: ml_worker
+    build: ml_worker/
+    depends_on:
+      - rabbitmq
 
 volumes:
     db_data:

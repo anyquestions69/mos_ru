@@ -8,3 +8,5 @@ COPY requirements.txt /ml_worker/
 
 RUN pip3 install -r ./requirements.txt --verbose
 COPY . /ml_worker/
+
+CMD [ "./run.sh" ]
