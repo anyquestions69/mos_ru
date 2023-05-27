@@ -468,7 +468,7 @@ for(let i=0; i<dst_arr.length;i++){
       type:$('#type').val(),
       status:$('#status').is(':checked'),
       cat_1:$('#cat_1').val(),
-      district:$('#district').val()
+      district:$('#district').val()==0?'':$('#district').val()
     }
     console.log(filter.district)
     urlParams.set('type',$('#type').val())

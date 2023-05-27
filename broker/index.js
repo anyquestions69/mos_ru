@@ -12,7 +12,7 @@ var amqp = require('amqplib/callback_api');
 var connection
 var channel
 
-amqp.connect('amqp://localhost', function(error0, conn) {
+amqp.connect('amqp://rabbitmq', function(error0, conn) {
     if (error0) {
         throw error0;
     }
@@ -43,7 +43,8 @@ io.on('connection', (socket) => {
                 }
                 var correlationId = generateUuid();
                 var ct= generateUuid()
-                channel.consume(q.queue,function(msg) {
+                channel.consume(q.queue,function(msg,err) {
+                    
                     if (msg.properties.correlationId === correlationId) {
                         console.log(' [.] По результатам теста %s', msg.content.toString());
                         socket.emit('response', msg.content.toString())
@@ -79,7 +80,10 @@ io.on('connection', (socket) => {
                 }
                 var correlationId = generateUuid();
                 var ct= generateUuid()
-                channel.consume(q.queue, function(msg) {
+                channel.consume(q.queue, function(msg, err) {
+                    if(err){
+                        console.log(err)
+                    }
                     if (msg.properties.correlationId === correlationId) {
                         console.log(' [.] User %s', msg.content.toString());
                         socket.emit('userRes', msg.content.toString())

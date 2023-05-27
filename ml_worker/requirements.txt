@@ -1,6 +1,5 @@
 pandas
-eventlet
+pika
 numpy
 scipy
 scikit-learn
-socketio

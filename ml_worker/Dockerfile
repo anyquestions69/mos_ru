@@ -1,12 +1,14 @@
-FROM python:3.8-alpine
+FROM python:3.10.4
 
-RUN apk update && apk add --no-cache \
-    gcc python3-dev 
+WORKDIR /ml_worker 
 
-WORKDIR /ml_worker
-COPY requirements.txt /ml_worker/
+#RUN apt update -y
+RUN python -m pip install --upgrade pip
+
+COPY . /ml_worker
 
 RUN pip3 install -r ./requirements.txt --verbose
-COPY . /ml_worker/
+RUN chmod a+x ./run.sh
+RUN chmod +x /ml_worker/wait-for-it.sh
 
 CMD [ "./run.sh" ]

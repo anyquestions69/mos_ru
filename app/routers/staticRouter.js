@@ -20,6 +20,7 @@ viewRouter.get('/',async(req,res)=>{
 
     ]})
         return  res.render('index.hbs', {
+            api_key:process.env.API_KEY,
             select:result,
             district:dst
             });

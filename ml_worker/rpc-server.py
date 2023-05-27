@@ -1,9 +1,13 @@
 import json
 import pika
 from functions import *
+import time
+
+print('STARTED WORKER 2')
 
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
+pika.ConnectionParameters(host='rabbitmq'))
+ 
 
 channel = connection.channel()
 

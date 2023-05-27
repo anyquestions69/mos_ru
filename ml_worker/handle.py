@@ -2,10 +2,13 @@ import json
 import uuid
 import pika
 from functions import *
+import time
+
+print('STARTED WORKER 1')
 
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
-
+pika.ConnectionParameters(host='rabbitmq'))
+ 
 channel = connection.channel()
 
 channel.queue_declare(queue='rpc_queue')

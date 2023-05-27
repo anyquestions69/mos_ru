@@ -37,7 +37,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-
+    networks:
+      - network
 
   broker:
     container_name: broker
@@ -50,16 +51,25 @@ services:
       - rabbitmq
     command: node index.js
     restart: always
+    networks:
+      - network
 
   ml_worker:
     container_name: ml_worker
     build: ml_worker/
     depends_on:
       - rabbitmq
+    restart: always
+    command: sh -c '/ml_worker/wait-for-it.sh rabbitmq:5672 --timeout=10 -- python3 /ml_worker/handle.py'
+    networks:
+      - network
 
 volumes:
     db_data:
 
 
-
+networks:
+  # Declare our private network.  We must declare one for the magic
+  # Docker DNS to work, but otherwise its default settings are fine.
+  network: {}
 
