@@ -18,24 +18,30 @@ def get_rec(us_id, us_list, fit_mx, sparse_mx, lessons_dct):#Функция дл
 
 
 def hotStart(id:int):
+    users = pd.read_csv('users.csv')
+    user = users[users['уникальный номер']== id]
     at = pd.read_csv('d.csv').drop(columns='Unnamed: 0')
-    prep_at = pd.read_csv('prep_attends.csv').drop(columns='Unnamed: 0')
+    gender = user['пол'].tolist()
+    if gender[0] == 'Женщина':
+        matrix = sparse.load_npz('women_sparce.npz')
+        fit = sparse.load_npz('women_fit.npz')
+        prep_at = pd.read_csv('prep_attends.csv').drop(columns='Unnamed: 0')
+        nums = [i + 1 for i in range(len(at.lesson.unique()))]
+        title_dict = dict(zip(nums, at.lesson.unique()))
+        rows, r_pos = np.unique(prep_at.values[:, 0], return_inverse=True)
+        columns, c_pos = np.unique(prep_at.values[:, 1], return_inverse=True)
 
-    nums = [i + 1 for i in range(len(at.lesson.unique()))]
-    title_dict = dict(zip(nums, at.lesson.unique()))
-    rows, r_pos = np.unique(prep_at.values[:, 0], return_inverse=True)
+    else:
+        matrix = sparse.load_npz('men_sparce.npz')
+        fit = sparse.load_npz('women_fit.npz')
+        prep_at = pd.read_csv('prep_attends.csv').drop(columns='Unnamed: 0')
+        nums = [i + 1 for i in range(len(at.lesson.unique()))]
+        title_dict = dict(zip(nums, at.lesson.unique()))
+        rows, r_pos = np.unique(prep_at.values[:, 0], return_inverse=True)
+        columns, c_pos = np.unique(prep_at.values[:, 1], return_inverse=True)
 
-    columns, c_pos = np.unique(prep_at.values[:, 1], return_inverse=True)
-    int_sparse = sparse.csr_matrix((prep_at.values[:, 2], (r_pos, c_pos)))
-
-    pui = normalize(int_sparse, norm='l2', axis=1)
-    sim = pui.T * pui
-
-    int_sparse_T = int_sparse.transpose(copy=True)
-
-    Piu = normalize(int_sparse_T, norm='l1', axis=1)
-    fit = pui * Piu * pui
-    return get_rec(id, rows, fit, int_sparse, title_dict)
+    
+    return get_rec(id, rows, fit, matrix, title_dict)
 
 
 def cold_start(mass: list):
@@ -74,5 +80,4 @@ def cold_start(mass: list):
         lst += fp
         lst = set(lst)
     return list(lst)
-
 

@@ -60,7 +60,7 @@ services:
     depends_on:
       - rabbitmq
     restart: always
-    command: sh -c '/ml_worker/wait-for-it.sh rabbitmq:5672 --timeout=15 -- python3 /ml_worker/handle.py && python3 /ml_worker/rpc-server.py'
+    command: sh -c '/ml_worker/wait-for-it.sh rabbitmq:5672 --timeout=15 -- python3 /ml_worker/handle.py & python3 /ml_worker/rpc-server.py'
     networks:
       - network
 

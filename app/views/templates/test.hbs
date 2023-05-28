@@ -125,30 +125,21 @@ function init() {
 
 location.then(
   function(result) {
-    // Добавление местоположения на карту.
-    console.log(result.geoObjects.get(0).properties.getAll())
-    console.log(result.geoObjects.properties.properties.get('metaDataProperty.GeocoderMetaData.AddressDetails.Country.AdministrativeArea.SubAdministrativeArea.Locality.LocalityName'));;
+    var userAddress = result.geoObjects.get(0).properties.get('text');
+    console.log(userAddress)
+    console.log(result.geoObjects.get(0).properties.get('boundedBy'))
+    ymaps.geocode('Москва, Льва Толстого', { results : 1 }).then(res=>{
+
+        console.log(ymaps.geocode(userAddress, { kind: 'district', results: 1 }))
+
+    })
   },
   function(err) {
     console.log('Ошибка: ' + err)
   }
 );
 }
-var url = "http://nominatim.openstreetmap.org/search";
-    $.getJSON(url, {q: 'Тореза, 95', format: "json", polygon_geojson: 1})
-        .then(function (data) {
-            $.each(data, function(ix, place) {
-                if ("relation" == place.osm_type) {
-// 2. Создаем полигон с нужными координатами
-                    console.log(place)
-                    var p = new ymaps.Polygon(place.geojson.coordinates);
-// 3. Добавляем полигон на карту
-                    map.geoObjects.add(p);
-                }
-            });
-        }, function (err) {
-            console.log(err);
-        });
+
 
 const questions=[{
      title:'Укажите Ваш пол?',
@@ -179,6 +170,7 @@ async function registered(id){
 }
 
  socket.on('userRes',(data)=>{
+        $('#load').modal('hide');
         let res = JSON.parse(data)
         window.location.href=`http://localhost:3000/?status=true&type=&days=&id=&activities=${res.join(',')}`
     } )
