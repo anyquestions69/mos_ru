@@ -447,8 +447,12 @@ for(let i=0; i<dst_arr.length;i++){
 
   $('#filter-name').val(id)
   $('#type').val(type||0).change();
-
-
+if(cat_1){
+  $('#cat_1').val(cat_1.split(',')).change()
+}
+if(activities){
+  $('#filter-name').val(activities.split(',').join(', ')).change()
+}
   if(days){
     let arr = days.split(',')
   for(let i =0; i<arr.length;i++){
@@ -469,11 +473,12 @@ for(let i=0; i<dst_arr.length;i++){
       status:$('#status').is(':checked'),
       cat_1:$('#cat_1').val(),
       district:$('#district').val()==0?'':$('#district').val()
+      
     }
     console.log(filter.district)
     urlParams.set('type',$('#type').val())
     urlParams.set('id',$('#filter-name').val())
-    getData(1,filter.type, filter.id, weekDays.join(), filter.status, filter.cat_1.join(), activities,filter.district)
+    getData(1,filter.type, filter.id.split(', ').join(), weekDays.join(), filter.status, filter.cat_1.join(), activities,filter.district)
     
       })
 });

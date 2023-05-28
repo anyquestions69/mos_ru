@@ -6,43 +6,46 @@ from sklearn.preprocessing import normalize
 def load_mx(filepath):#Функция для загрузки массивов
     return np.load(filepath, allow_pickle=True)
 
-def get_rec(us_id, us_list, fit_mx, sparse_mx, lessons_dct):#Функция для получения рекомендаций
-    ind = 0
-    for i in range(len(us_list)):
-        if us_list[i] == us_id:
-            ind = i
-            break
-    initial_set = set([lessons_dct[i + 1] for i in np.nonzero(sparse_mx[ind])[1].tolist()])
-    pred_set = set([lessons_dct[i + 1] for i in fit_mx[ind].toarray().argsort()[0][-30:].tolist()])
-    return list(pred_set - initial_set)[:10]
-
-
-def hotStart(id:int):
-    users = pd.read_csv('users.csv')
-    user = users[users['уникальный номер']== id]
-    at = pd.read_csv('d.csv').drop(columns='Unnamed: 0')
-    gender = user['пол'].tolist()
-    if gender[0] == 'Женщина':
-        matrix = sparse.load_npz('women_sparce.npz')
-        fit = sparse.load_npz('women_fit.npz')
-        prep_at = pd.read_csv('prep_attends.csv').drop(columns='Unnamed: 0')
-        nums = [i + 1 for i in range(len(at.lesson.unique()))]
-        title_dict = dict(zip(nums, at.lesson.unique()))
-        rows, r_pos = np.unique(prep_at.values[:, 0], return_inverse=True)
-        columns, c_pos = np.unique(prep_at.values[:, 1], return_inverse=True)
-
-    else:
-        matrix = sparse.load_npz('men_sparce.npz')
-        fit = sparse.load_npz('women_fit.npz')
-        prep_at = pd.read_csv('prep_attends.csv').drop(columns='Unnamed: 0')
-        nums = [i + 1 for i in range(len(at.lesson.unique()))]
-        title_dict = dict(zip(nums, at.lesson.unique()))
-        rows, r_pos = np.unique(prep_at.values[:, 0], return_inverse=True)
-        columns, c_pos = np.unique(prep_at.values[:, 1], return_inverse=True)
-
-    
+def get_rec(us_id, us_list, fit_mx, sparse_mx, lessons_dct):#Функция для получения рекомендаций 
+    ind = 0 
+    for i in range(len(us_list)): 
+        if us_list[i] == us_id: 
+            ind = i 
+            break 
+    initial_set = set([lessons_dct[i + 1] for i in np.nonzero(sparse_mx[ind])[1].tolist()]) 
+    pred_set = set([lessons_dct[i + 1] for i in fit_mx[ind].toarray().argsort()[0][-30:].tolist()]) 
+    return list(pred_set - initial_set)[:10] 
+ 
+ 
+def hotStart(id:int): 
+    users = pd.read_csv('users.csv') 
+    user = users[users['уникальный номер']== id] 
+    at = pd.read_csv('d.csv').drop(columns='Unnamed: 0') 
+    gender = user['пол'].tolist() 
+    if gender[0] == 'Женщина': 
+        matrix = sparse.load_npz('women_sparce.npz') 
+        fit = sparse.load_npz('women_fit.npz') 
+        prep_at = pd.read_csv('prepared_for_matrix.csv').drop(columns='Unnamed: 0') 
+        prep_at = prep_at[prep_at['пол'] == 'Женщина']
+        prep_at = prep_at.drop(columns=['пол'])
+        nums = [i + 1 for i in range(len(at.lesson.unique()))] 
+        title_dict = dict(zip(nums, at.lesson.unique())) 
+        rows, r_pos = np.unique(prep_at.values[:, 0], return_inverse=True) 
+        columns, c_pos = np.unique(prep_at.values[:, 1], return_inverse=True) 
+ 
+    else: 
+        matrix = sparse.load_npz('men_sparce.npz') 
+        fit = sparse.load_npz('men_fit.npz') 
+        prep_at = pd.read_csv('prepared_for_matrix.csv').drop(columns='Unnamed: 0') 
+        prep_at = prep_at[prep_at['пол'] == 'Мужчина']
+        prep_at = prep_at.drop(columns=['пол']) 
+        nums = [i + 1 for i in range(len(at.lesson.unique()))] 
+        title_dict = dict(zip(nums, at.lesson.unique())) 
+        rows, r_pos = np.unique(prep_at.values[:, 0], return_inverse=True) 
+        columns, c_pos = np.unique(prep_at.values[:, 1], return_inverse=True) 
+ 
+     
     return get_rec(id, rows, fit, matrix, title_dict)
-
 
 def cold_start(mass: list):
     data=pd.read_csv('data_for_start.csv').drop(columns='Unnamed: 0')

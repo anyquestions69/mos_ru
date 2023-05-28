@@ -23,9 +23,23 @@ class Manager{
                 if(!isNaN(id) && !isNaN(parseInt(id))){
                     filter.push({id:id})
                 }else{
+                    let arr = id.split(',')
+                    console.log(arr)
+                    if(id.includes(',')){
+                    
+                    let obj=[]
+                    for(let a=0; a<arr.length;a++){
+                        obj.push({[Op.substring]: arr[a]})
+                    }
+                    console.log(obj)
                     filter.push({activity:{
-                        [Op.substring]: id
+                        [Op.or]: obj
                     }})
+                    }else{
+                        filter.push({activity:{
+                            [Op.substring]: id
+                        }})
+                    }
                 }
             }
             if(activities){

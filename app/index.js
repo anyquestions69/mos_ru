@@ -27,6 +27,6 @@ api.use('/groups', groupRouter)
 app.use('/api', api)
 app.use('/', viewRouter)
 
-app.listen(3000,()=>{
+app.listen(80,()=>{
     console.log('works')
 })
