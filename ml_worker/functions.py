@@ -37,3 +37,42 @@ def hotStart(id:int):
     fit = pui * Piu * pui
     return get_rec(id, rows, fit, int_sparse, title_dict)
 
+
+def cold_start(mass: list):
+    data=pd.read_csv('data_for_start.csv').drop(columns='Unnamed: 0')
+    func_data = data[data.gender == mass[0]]
+    lst = []
+    #Первый вопрос
+    if mass[1] == 'Пение':
+        song = list(func_data[func_data.direction == 'Пение'].sort_values(by='quantity', ascending=False).head(3).leve3)
+        lst = song
+    elif mass[1] == 'Рисование':
+        drawing = list(func_data[func_data.direction == 'Рисование'].sort_values(by='quantity', ascending=False).head(3).leve3)
+        lst = drawing
+    else:
+        fp = list(func_data[func_data.direction == 'Физическая активность'].sort_values(by='quantity', ascending=False).head(3).leve3)
+        lst = fp
+    #Второй вопрос
+    if mass[2] == 'Отправиться в поход':
+        act = list(func_data[func_data['Разметка: Для ума/ Для души / Для тела'] == 'Для тела'].head(3).leve3)
+        lst += act
+    elif mass[2] == 'Посетить санаторий':
+        act = list(func_data[func_data['Разметка: Для ума/ Для души / Для тела'] == 'Для души'].head(3).leve3)
+        lst += act
+    else:
+        act = list(func_data[func_data['Разметка: Для ума/ Для души / Для тела'] == 'Для ума'].head(3).leve3)
+        lst += act
+    #Третий вопрос
+    if mass[3] == 'Выпуски новостей, интеллектуальные викторины':
+        act = list(func_data[func_data.direction == 'Спецпроект / Интеллектуальный клуб'].sort_values(by='quantity', ascending=False).head(3).leve3)
+        lst += act
+    elif mass[3] == 'Различные музыкальные, танцевальные и развлекательные шоу':
+        drawing = list(func_data[func_data.direction == 'Творчество'].sort_values(by='quantity', ascending=False).head(3).leve3)
+        lst += drawing
+    else:
+        fp = list(data[data.direction == 'Физическая активность'].sort_values(by='quantity', ascending=False).head(6).leve3)
+        lst += fp
+        lst = set(lst)
+    return list(lst)
+
+

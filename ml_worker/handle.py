@@ -17,13 +17,15 @@ channel.queue_declare(queue='rpc_queue')
 def on_request(ch, method, props, body):
    
     print(json.loads(body))
-    response = json.dumps(['Образование', 'Творчество'])
 
+    
+    response = cold_start(json.loads(body))
+    print(response)
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,
                      properties=pika.BasicProperties(correlation_id = \
                                                          props.correlation_id),
-                     body=str(response))
+                     body=json.dumps(response))
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 consumer_tag = uuid.uuid1().hex

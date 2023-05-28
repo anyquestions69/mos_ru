@@ -20,14 +20,16 @@ viewRouter.get('/',async(req,res)=>{
 
     ]})
         return  res.render('index.hbs', {
-            api_key:process.env.API_KEY,
+            
             select:result,
             district:dst
             });
 
 })
 viewRouter.get('/test',(req,res)=>{
-    return res.render('test.hbs')
+    return res.render('test.hbs',{
+        api_key:process.env.API_KEY,
+    })
 })
 viewRouter.get('/groups/:id', groupController.viewOne)
 viewRouter.get('/store-data', (req,res)=>{

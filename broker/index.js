@@ -31,7 +31,7 @@ io.on('connection', (socket) => {
     console.log('connected')
     socket.on('results', async(res)=>{
         let qmsg = JSON.stringify(res)
-
+        console.log(qmsg)
         if(channel){
             channel.prefetch(1, false);
             channel.assertQueue('', {

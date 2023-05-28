@@ -11,8 +11,10 @@
 <body class="" >
   {{>nav}}
     <div class="container bg-primary-subtle m-auto"> 
-        <div class="modal fade" id="load" tabindex="-1" aria-labelledby="loadLabel" aria-hidden="true">
+        <div class="modal fade text-center" id="load" tabindex="-1" style="width:300px;margin:200px auto 0;" aria-labelledby="loadLabel" aria-hidden="true">
             <div class="modal-content">
+                <div class="modal-header">Загрузка...</div>
+                <div class="modal-body">
             <svg role="img" aria-label="Mouth and eyes come from 9:00 and rotate clockwise into position, right eye blinks, then all parts rotate and merge into 3:00" class="smiley" viewBox="0 0 128 128" width="128px" height="128px">
                 <defs>
                     <clipPath id="smiley-eyes">
@@ -44,6 +46,7 @@
                     </g>
                 </g>
             </svg>
+            </div>
             </div>
         </div>
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -115,23 +118,43 @@ $('#modalSearch').on('click', ()=>{
     let id = $('#userId').val()
     registered(id)
 })
-/*ymaps.ready(init);
+ymaps.ready(init);
 
 function init() {
-  var location = ymaps.geolocation.get({autoReverseGeocode:true});
+  var location = ymaps.geolocation.get({provider: 'yandex', autoReverseGeocode:true});
 
 location.then(
   function(result) {
     // Добавление местоположения на карту.
-    console.log(result.geoObjects)//.get(0).properties.getAll())
+    console.log(result.geoObjects.get(0).properties.getAll())
+    console.log(result.geoObjects.properties.properties.get('metaDataProperty.GeocoderMetaData.AddressDetails.Country.AdministrativeArea.SubAdministrativeArea.Locality.LocalityName'));;
   },
   function(err) {
     console.log('Ошибка: ' + err)
   }
 );
-}*/
+}
+var url = "http://nominatim.openstreetmap.org/search";
+    $.getJSON(url, {q: 'Тореза, 95', format: "json", polygon_geojson: 1})
+        .then(function (data) {
+            $.each(data, function(ix, place) {
+                if ("relation" == place.osm_type) {
+// 2. Создаем полигон с нужными координатами
+                    console.log(place)
+                    var p = new ymaps.Polygon(place.geojson.coordinates);
+// 3. Добавляем полигон на карту
+                    map.geoObjects.add(p);
+                }
+            });
+        }, function (err) {
+            console.log(err);
+        });
 
 const questions=[{
+     title:'Укажите Ваш пол?',
+    options:['Мужчина','Женщина']
+},
+{
     title:'Чем вы занимались в детстве?',
     options:['Спортом и различными видами активной деятельности', 'Пение', 'Рисование']
 },
@@ -171,7 +194,7 @@ async function sendResults(res){
         console.log(data)
         let response = JSON.parse(data)
         console.log(response)
-        window.location.href=`http://localhost:3000/?status=true&type=&cat_1=${response.join(',')}`
+        window.location.href=`http://localhost:3000/?status=true&type=&activities=${response.join(',')}`
     } )
 
 function showQuestion(n,t){

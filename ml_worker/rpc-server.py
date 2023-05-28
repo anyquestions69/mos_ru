@@ -18,6 +18,7 @@ def on_request(ch, method, props, body):
    
     print(int(body))
     response = hotStart(int(body))
+    print(response)
 
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,

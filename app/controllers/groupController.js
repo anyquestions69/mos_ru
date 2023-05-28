@@ -140,7 +140,7 @@ class Manager{
         }
         let group = await Group.findOne({where:{id:Number(req.params['id'])}})
         return res.render('group.hbs', {
-            
+            api_key:process.env.API_KEY,
             group:group
             });
     }
