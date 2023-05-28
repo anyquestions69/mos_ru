@@ -32,9 +32,7 @@ viewRouter.get('/test',(req,res)=>{
     })
 })
 viewRouter.get('/groups/:id', groupController.viewOne)
-viewRouter.get('/store-data', (req,res)=>{
-    return res.render('loading.hbs')
-})
+
 
 
 module.exports = viewRouter
