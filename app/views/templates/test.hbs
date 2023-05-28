@@ -100,7 +100,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div><input type="hidden" name="" id="host" value="{{host}}">
 
     </div>
          
@@ -172,13 +172,13 @@ async function registered(id){
  socket.on('userRes',(data)=>{
         $('#load').modal('hide');
         let res = JSON.parse(data)
-        window.location.href=`http://localhost:3000/?status=true&type=&days=&id=&activities=${res.join(',')}`
+        window.location.href=`http://${$('#host').val()}/?status=true&type=&days=&id=&activities=${res.join(',')}`
     } )
 
 async function sendResults(res){
     
     socket.emit("results", res);
-    
+    $('#load').modal('show');
    
 }
 
@@ -186,7 +186,7 @@ async function sendResults(res){
         console.log(data)
         let response = JSON.parse(data)
         console.log(response)
-        window.location.href=`http://localhost:3000/?status=true&type=&activities=${response.join(',')}`
+        window.location.href=`http://${$('#host').val()}/?status=true&type=&activities=${response.join(',')}`
     } )
 
 function showQuestion(n,t){

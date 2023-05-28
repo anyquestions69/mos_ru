@@ -29,6 +29,7 @@ viewRouter.get('/',async(req,res)=>{
 viewRouter.get('/test',(req,res)=>{
     return res.render('test.hbs',{
         api_key:process.env.API_KEY,
+        host:process.env.HOST
     })
 })
 viewRouter.get('/groups/:id', groupController.viewOne)
