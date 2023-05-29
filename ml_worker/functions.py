@@ -84,3 +84,4 @@ def cold_start(mass: list):
         lst = set(lst)
     return list(lst)
 
+print(hotStart(101391104))

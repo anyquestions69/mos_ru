@@ -10,6 +10,8 @@ services:
       - "80:80"
     depends_on:
       - db
+    networks:
+      - network
     env_file:
       - ./app/.env
     command: npm run start
@@ -29,6 +31,8 @@ services:
       - ./db_data:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
+    networks:
+      - network
     restart: always
 
   rabbitmq:
